@@ -23,9 +23,9 @@ class FakeUserSeeder extends Seeder
         $faker = Faker::create('id_ID'); // Use 'id_ID' for Indonesian locale
 
         for ($i = 0; $i < 25; $i++) {
-          
+
              // Generate a name
-            $name = faker->name();
+            $name = $faker->name();
 
             // Convert the name to a more email-friendly format
             $emailName = strtolower(str_replace(' ', '.', preg_replace('/[^a-zA-Z\s]/', '', $name)));
