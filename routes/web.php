@@ -106,3 +106,7 @@ if(config('saas.SAAS_ACTIVATED')){
     require __DIR__ . '/saas.php';
 }
 
+if(config('saas.SAAS_ACTIVATED')){
+    require __DIR__ . '/ubayda.php';
+}
+

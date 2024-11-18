@@ -35,6 +35,13 @@
             @include('admin.components.sidebar.saas.package-menu')
         @endif
 
+        {{-- =============================================== --}}
+        {{-- UBAYDA SPECIFIC MENU --}}
+        {{-- =============================================== --}}
+        @if (config('ubayda.UBAYDA_ACTIVATED'))
+            @include('admin.components.sidebar.ubayda.business-menu')
+        @endif
+
 
 
         {{-- =============================================== --}}

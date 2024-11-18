@@ -27,6 +27,9 @@ class DatabaseSeeder extends Seeder
             SubscriptionUserSeeder::class,
             SubscriptionHistorySeeder::class,
 
+            //Ubayda related
+            BusinessSeeder::class,
+
 
         ]);
 
