@@ -6,4 +6,13 @@ return [
     'UBAYDA_ACTIVATED'    => TRUE,
     'UBAYDA_BUSINESS_OWNER'    => "OWNER",
 
+    "BUSINESS_TYPE" => [
+        "MANDIRI / PERSEORANGAN",
+        "PENDIDIKAN",
+        "PERUSAHAAN PEMERINTAH",
+        "SWASTA (PT / CV)",
+        "UKM",
+        "YAYASAN",
+    ]
+
 ];

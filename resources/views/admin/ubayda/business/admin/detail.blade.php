@@ -1,6 +1,6 @@
 @extends('admin.template-base', ['searchNavbar' => false])
 
-@section('page-title', 'Detail of User Subscription')
+@section('page-title', 'Detail of User Business')
 
 {{-- MAIN CONTENT PART --}}
 @section('main-content')
@@ -17,7 +17,7 @@
             <div class="d-flex justify-content-between">
 
                 <div class="bd-highlight">
-                    <h3 class="card-header">Detail of Subscription with id : {{ $data->id }}</h3>
+                    <h3 class="card-header">Detail of Business with id : {{ $data->id }}</h3>
                 </div>
 
             </div>
@@ -38,12 +38,22 @@
                                     <td>{{ $data->name }}</td>
                                 </tr>
                                 <tr>
-                                    <th scope="col" class="bg-dark text-white">Address</th>
+                                    <th scope="col" class="bg-dark text-white">Business Address</th>
                                     <td>{{ $data->address }}</td>
                                 </tr>
                                 <tr>
-                                    <th scope="col" class="bg-dark text-white">Type</th>
+                                    <th scope="col" class="bg-dark text-white">Business Type</th>
                                     <td>{{ $data->type }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="col" class="bg-dark text-white">Is Active</th>
+                                    <td>
+                                        @if ($data->is_active)
+                                            <span class="badge rounded-pill bg-success"> Yes </span>
+                                        @else
+                                            <span class="badge rounded-pill bg-danger"> No </span>
+                                        @endif
+                                    </td>
                                 </tr>
 
                             </tbody>
@@ -60,28 +70,26 @@
 
 
 
-
-
             {{-- ROW FOR ADDITIONAL FUNCTIONALITY BUTTON --}}
             <div class="m-4">
                 <a onclick="goBack()" class="btn btn-outline-secondary me-2"><i
                         class="tf-icons bx bx-left-arrow-alt me-2"></i>Back</a>
 
                 {{-- SUSPEND or UNSUSPEND Button --}}
-                @if (!$data->is_suspended)
-                    <a class="btn btn-danger me-2" href="{{ route('subscription.user.suspend', ['id' => $data->id]) }}"
+                @if ($data->is_active)
+                    <a class="btn btn-danger me-2" href="{{ route('ubayda.business.admin.suspend', ['id' => $data->id]) }}"
                         title="Suspend user">
-                        <i class='tf-icons bx bx-pause me-2'></i>Suspend</a>
+                        <i class='tf-icons bx bx-pause me-2'></i>Deactivate</a>
                 @else
-                    <a class="btn btn-success me-2" href="{{ route('subscription.user.unsuspend', ['id' => $data->id]) }}"
+                    <a class="btn btn-success me-2" href="{{ route('ubayda.business.admin.unsuspend', ['id' => $data->id]) }}"
                         title="Unsuspend user">
-                        <i class='tf-icons bx bx-play me-2'></i>Unsuspend</a>
+                        <i class='tf-icons bx bx-play me-2'></i>Activate</a>
                 @endif
 
                 {{-- NEW SUBSCRIPTION BUTTON --}}
-                <a class="btn btn-success me-2" href="{{ route('subscription.user.add', ['user' => $data->user_id]) }}"
+                <a class="btn btn-success me-2" href="{{ route('ubayda.business.admin.add', ['user' => $data->user_id]) }}"
                     title="Suspend user">
-                    <i class='tf-icons bx bx-plus me-2'></i>New Subscription</a>
+                    <i class='tf-icons bx bx-plus me-2'></i>New Business</a>
 
             </div>
 

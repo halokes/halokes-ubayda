@@ -10,7 +10,14 @@
         <!-- Search -->
         <div class="navbar-nav align-items-center">
             <div class="nav-item d-flex align-items-center">
-               Thanks for buy this,&nbsp; <strong>{{ auth()->user()->name }}</strong>, lets make awesome Apps..!!
+                @if (!is_null(session('MY_ACTIVE_BUSINESS_NAME', null)))
+                    Your current Active Business :&nbsp; <strong> {{session('MY_ACTIVE_BUSINESS_NAME', null)}} </strong>
+                    &nbsp;&nbsp;
+                    <span class="text-xs"> [<a href="{{route('ubayda.business.user.index')}}">Change</a>] </span>
+                @else
+                    Thanks for buy this,&nbsp; <strong>{{ auth()->user()->name }}</strong>, lets make awesome Apps..!!
+                @endif
+
             </div>
         </div>
         <!-- /Search -->

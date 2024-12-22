@@ -15,6 +15,6 @@ class BusinessUser extends Model
     public $incrementing = false;
 
     protected $table = 'business_user'; // Specify the pivot table
-    protected $fillable = ['user_id', 'business_id', 'role'];
+    protected $fillable = ['user_id', 'business_id', 'role', 'last_selected'];
 
   }

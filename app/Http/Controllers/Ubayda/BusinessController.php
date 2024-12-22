@@ -4,24 +4,29 @@ namespace App\Http\Controllers\Ubayda;
 
 use App\Helpers\AlertHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Ubayda\BusinessFindUserRequest;
 use App\Http\Requests\Ubayda\BusinessListRequest;
 use App\Services\Ubayda\BusinessService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BusinessController extends Controller
 {
 
     private $businessService;
     private $mainBreadcrumbs;
+    private $userService;
 
-    public function __construct(BusinessService $businessService)
+    public function __construct(BusinessService $businessService, UserService $userService)
     {
         $this->businessService = $businessService;
+        $this->userService = $userService;
 
         // Store common breadcrumbs in the constructor
         $this->mainBreadcrumbs = [
-            'Businesss' => route('ubayda.business.index'),
+            'Businesss' => route('ubayda.business.admin.index'),
+            'Businesss' => route('ubayda.business.admin.index'),
         ];
     }
 
@@ -34,7 +39,7 @@ class BusinessController extends Controller
      *      list all search and filter/sort things
      * =============================================
      */
-    public function index(BusinessListRequest $request)
+    public function indexAdmin(BusinessListRequest $request)
     {
         $sortField = session()->get('sort_field', $request->input('sort_field', 'id'));
         $sortOrder = session()->get('sort_order', $request->input('sort_order', 'asc'));
@@ -43,13 +48,15 @@ class BusinessController extends Controller
         $page = $request->input('page', config('constant.CRUD.PAGE'));
         $keyword = $request->input('keyword');
 
-        $businesses = $this->businessService->listAllBusiness($perPage, $sortField, $sortOrder, $keyword);
+        $userId = $request->input('userId');
+
+        $businesses = $this->businessService->listAllBusiness($perPage, $sortField, $sortOrder, $keyword, $userId);
 
         $breadcrumbs = array_merge($this->mainBreadcrumbs, ['List' => null]);
 
         $alerts = AlertHelper::getAlerts();
 
-        return view('admin.ubayda.business.index', compact('businesses', 'breadcrumbs', 'sortField', 'sortOrder', 'perPage', 'page', 'keyword', 'alerts'));
+        return view('admin.ubayda.business.admin.index', compact('businesses', 'breadcrumbs', 'sortField', 'sortOrder', 'perPage', 'page', 'keyword', 'alerts'));
     }
 
     /**
@@ -57,7 +64,7 @@ class BusinessController extends Controller
      *      see the detail of single Subscription
      * =============================================
      */
-    public function detail(Request $request)
+    public function detailAdmin(Request $request)
     {
         $data = $this->businessService->getBusinessDetail($request->id);
         $alerts = AlertHelper::getAlerts();
@@ -66,49 +73,129 @@ class BusinessController extends Controller
         if ($data) {
             $breadcrumbs = array_merge($this->mainBreadcrumbs, ['Detail' => null]);
 
-            return view('admin.ubayda.business.detail', compact('breadcrumbs', 'data', 'alerts'));
+            return view('admin.ubayda.business.admin.detail', compact('breadcrumbs', 'data', 'alerts'));
         } else {
             $alert = AlertHelper::createAlert('danger', 'Error : Cannot View Business Detail, Oops! no such data with that ID : ' . $request->id);
 
-            return redirect()->route('subscription.user.index')->with('alerts', [$alert]);
+            return redirect()->route('ubayda.business.admin.index')->with('alerts', [$alert]);
         }
     }
 
     /**
      * =============================================
-     *      display "add new business" pages
+     *      process create Business
      * =============================================
      */
-    public function create(Request $request)
+    public function create(BusinessFindUserRequest $request)
     {
 
-        $breadcrumbs = array_merge($this->mainBreadcrumbs, ['Add' => null]);
+        $sortField = session()->get('sort_field', $request->input('sort_field', 'id'));
+        $sortOrder = session()->get('sort_order', $request->input('sort_order', 'asc'));
 
-        return view('admin.ubayda.businessadd', compact('breadcrumbs'));
+        $perPage = $request->input('per_page', config('constant.CRUD.PER_PAGE'));
+        $page = $request->input('page', config('constant.CRUD.PAGE'));
+        $keyword = $request->input('keyword');
+        $alerts = AlertHelper::getAlerts();
+
+        // JIKA USER SUDAH DISET / BELUM
+        if (isset($request->user)) {
+            $userIsSet = true;
+            $findUsers = null;
+            //find users first
+            $userFound = $this->userService->getUserDetail($request->user);
+
+            // if user is not found or invalid users
+            if (!$userFound) {
+                $alert =  AlertHelper::createAlert('danger', 'Error : Invalid user Id : ' . $request->user);
+                $userFound = null;
+                return redirect()->route('ubayda.business.admin.index')->with([
+                    'alerts' => [$alert]
+                ]);
+            }
+
+            if (!$userFound->is_active) {
+                $alerts = [...$alerts, AlertHelper::createAlert('danger', 'This user is inactive state, you cannot add business to this')];
+            }
+
+            $breadcrumbs = array_merge($this->mainBreadcrumbs, ['Add (Step 2/2 : Add Business)' => null]);
+
+
+            return view('admin.ubayda.business.admin.add', compact('userIsSet', 'alerts', 'userFound', 'breadcrumbs'));
+        } else {
+            $userFound = null;
+
+            $userIsSet = false;
+            $breadcrumbs = array_merge($this->mainBreadcrumbs, ['Add (Step 1/2 : Choose User)' => route('ubayda.business.admin.add')]);
+
+            $findUsers = $this->userService->listAllUser($perPage, $sortField, $sortOrder, $keyword);
+
+            $alerts = AlertHelper::getAlerts();
+
+            return view('admin.ubayda.business.admin.find-user', compact('userIsSet', 'userFound', 'findUsers', 'breadcrumbs', 'sortField', 'sortOrder', 'perPage', 'page', 'keyword'));
+        }
     }
 
-    // /**
-    //  * =============================================
-    //  *      proses "add new business" from previous form
-    //  * =============================================
-    //  */
-    // public function store(BusinessAddRequest $request)
-    // {
-    //     $validatedData = $request->validated();
 
-    //     // dd($validatedData);
 
-    //     $result = $this->businessService->addNewBusiness($validatedData);
+    /**
+     * =============================================
+     *      suspend and unsuspend
+     * =============================================
+     */
+    public function suspendAdmin($businessId, $suspendAction = 1)
+    {
+        $action = $suspendAction == 1 ? "suspend" : "unsuspend";
+        $subscriptionData = $this->subscriptionUserService->getSubscriptionDetail($subscriptionId);
+        $userEmail =  $subscriptionData->user->email;
+        $userPackage =  $subscriptionData->package->package_name;
+        try {
+            $data = $this->subscriptionUserService->suspendUnsuspend($subscriptionId, $suspendAction, Auth::user()->id);
+            if (!$data) {
+                throw new Exception("failed to " . $action . " data, returned data is null / false from repository ");
+            }
+            $alert = AlertHelper::createAlert('success', 'Success ' . $action . ' data with ID : ' . $subscriptionId . " (" . $userEmail . " - " . $userPackage . ")");
+        } catch (Exception $e) {
+            Log::error("Error suspend / unsuspend caused by ", [
+                "subscriptionId"    => $subscriptionId,
+                "cause" => $e->getMessage()
+            ]);
+            $alert = AlertHelper::createAlert('danger', 'Error : Failed to ' . $action . ' data with ID : ' . $subscriptionId . " (" . $userEmail . " - " . $userPackage . ")");
+        }
 
-    //     $alert = $result
-    //         ? AlertHelper::createAlert('success', 'Data ' . $result->business_name . ' successfully added')
-    //         : AlertHelper::createAlert('danger', 'Data ' . $result->business_name . ' failed to be added');
+        return redirect()->back()->with([
+            'alerts' => [$alert],
+            'sort_field' => 'subscription_user.updated_at',
+            'sort_order' => 'desc'
+        ]);
+    }
 
-    //     return redirect()->route('subscription.business.index')->with([
-    //         'alerts'        => [$alert],
-    //         'sort_order'    => 'desc'
-    //     ]);
-    // }
+    public function unsuspendAdmin($businessId)
+    {
+        return $this->suspend($businessId, 2);
+    }
+
+    /**
+     * =============================================
+     *      proses "add new business" from previous form
+     * =============================================
+     */
+    public function store(BusinessAddRequest $request)
+    {
+        $validatedData = $request->validated();
+
+        // dd($validatedData);
+
+        $result = $this->businessService->addNewBusiness($validatedData);
+
+        $alert = $result
+            ? AlertHelper::createAlert('success', 'Data ' . $result->business_name . ' successfully added')
+            : AlertHelper::createAlert('danger', 'Data ' . $result->business_name . ' failed to be added');
+
+        return redirect()->route('subscription.business.index')->with([
+            'alerts'        => [$alert],
+            'sort_order'    => 'desc'
+        ]);
+    }
 
     // /**
     //  * =============================================
@@ -217,4 +304,8 @@ class BusinessController extends Controller
 
     //     return redirect()->route('subscription.business.index')->with('alerts', [$alert]);
     // }
+
+
+
+
 }

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('role'); // Possible values: 'owner', 'editor', 'viewer'
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
+            $table->string('last_selected')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

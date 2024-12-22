@@ -20,7 +20,7 @@
                     <h3 class="card-header">List of Business</h3>
                 </div>
                 <div class="p-2">
-                    <a class="btn btn-primary" href="{{ route('ubayda.business.add') }}">
+                    <a class="btn btn-primary" href="{{ route('ubayda.business.admin.add') }}">
                         <span class="tf-icons bx bx-plus"></span>&nbsp;
                         Add New Business
                     </a>
@@ -67,9 +67,10 @@
                             <th>
                                 No
                             </th>
-                            <th style="max-width: 250px; word-wrap: break-word; white-space: normal; overflow-wrap: break-word;">
+                            <th
+                                style="max-width: 250px; word-wrap: break-word; white-space: normal; overflow-wrap: break-word;">
                                 <a
-                                    href="{{ route('ubayda.business.index', [
+                                    href="{{ route('ubayda.business.admin.index', [
                                         'sort_field' => 'name',
                                         'sort_order' => $sortOrder == 'asc' ? 'desc' : 'asc',
                                         'keyword' => $keyword,
@@ -82,9 +83,10 @@
                                     ])
                                 </a>
                             </th>
-                            <th style="max-width: 300px; word-wrap: break-word; white-space: normal; overflow-wrap: break-word;">
+                            <th
+                                style="max-width: 300px; word-wrap: break-word; white-space: normal; overflow-wrap: break-word;">
                                 <a
-                                    href="{{ route('ubayda.business.index', [
+                                    href="{{ route('ubayda.business.admin.index', [
                                         'sort_field' => 'address',
                                         'sort_order' => $sortOrder == 'asc' ? 'desc' : 'asc',
                                         'keyword' => $keyword,
@@ -99,7 +101,7 @@
                             </th>
                             <th>
                                 <a
-                                    href="{{ route('ubayda.business.index', ['sort_field' => 'type', 'sort_order' => $sortOrder == 'asc' ? 'desc' : 'asc', 'keyword' => $keyword]) }}">
+                                    href="{{ route('ubayda.business.admin.index', ['sort_field' => 'type', 'sort_order' => $sortOrder == 'asc' ? 'desc' : 'asc', 'keyword' => $keyword]) }}">
                                     Business Type
                                     @include('components.arrow-sort', [
                                         'field' => 'type',
@@ -110,7 +112,7 @@
                             </th>
                             <th>
                                 <a
-                                    href="{{ route('ubayda.business.index', ['sort_field' => 'owner_email', 'sort_order' => $sortOrder == 'asc' ? 'desc' : 'asc', 'keyword' => $keyword]) }}">
+                                    href="{{ route('ubayda.business.admin.index', ['sort_field' => 'owner_email', 'sort_order' => $sortOrder == 'asc' ? 'desc' : 'asc', 'keyword' => $keyword]) }}">
                                     Owner
                                     @include('components.arrow-sort', [
                                         'field' => 'owner_email',
@@ -133,32 +135,40 @@
                         @foreach ($businesses as $business)
                             <tr>
                                 <td>{{ $startNumber++ }}</td>
-                                <td style="max-width: 250px; overflow-wrap: break-word; white-space: normal;">{{ $business->name }}</td>
+                                <td style="max-width: 250px; overflow-wrap: break-word; white-space: normal;">
+                                    {{ $business->name }}</td>
                                 <td style="max-width: 300px; overflow-wrap: break-word; white-space: normal;">
                                     {{ $business->address }}
                                 </td>
                                 <td>{{ $business->type }}</td>
-                                <td><a href="{{ route('admin.user.detail', ['id' => $business->owner_id]) }}"
-                                        target="_blank"> {{ $business->owner_name }}
-                                        <br />{{ $business->owner_email }}</a></td>
+                                <td>
+                                    @if ($business->owner_id)
+                                        <a href="{{ route('admin.user.detail', ['id' => $business->owner_id]) }}"
+                                            target="_blank">
+                                            {{ $business->owner_email }}
+                                        </a>
+                                    @else
+                                        <span>N/A</span>
+                                    @endif
+                                </td>
 
                                 {{-- ============ CRUD LINK ICON =============  --}}
                                 <td>
                                     <a class="action-icon"
-                                        href="{{ route('ubayda.business.detail', ['id' => $business->id]) }}"
+                                        href="{{ route('ubayda.business.admin.detail', ['id' => $business->id]) }}"
                                         title="detail">
                                         <i class='bx bx-search'></i>
                                     </a>
                                 </td>
                                 <td>
                                     <a class="action-icon"
-                                        href="{{ route('ubayda.business.edit', ['id' => $business->id]) }}" title="edit">
+                                        href="{{ route('ubayda.business.admin.edit', ['id' => $business->id]) }}" title="edit">
                                         <i class='bx bx-pencil'></i>
                                     </a>
                                 </td>
                                 <td>
                                     <a class="action-icon"
-                                        href="{{ route('ubayda.business.delete', ['id' => $business->id]) }}"
+                                        href="{{ route('ubayda.business.admin.delete', ['id' => $business->id]) }}"
                                         title="delete">
                                         <i class='bx bx-trash'></i>
                                     </a>

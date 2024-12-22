@@ -4,20 +4,21 @@ namespace App\Http\Requests\Ubayda;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class BusinessListRequest extends FormRequest
+class BusinessFindUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
+        // Set to true if you don't have specific authorization logic
         return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
+     * @return array
      */
     public function rules(): array
     {
@@ -25,11 +26,11 @@ class BusinessListRequest extends FormRequest
             "per_page" => "nullable|integer",
             "page" => "nullable|integer",
             "sort_order" => "nullable|string|in:ASC,DESC,asc,desc",
-            "sort_field" => "nullable|string|in:name,address,type,owner_name,owner_email,role",
+            "sort_field" => "nullable|string|in:NAME,id,name,email,is_active,created_at",
             "keyword" => "nullable|string",
-            "role" => "nullable|string",
-            "userId" => "nullable|uuid",
-            "userId" => "nullable|uuid",
+            "user" => "nullable|string",
         ];
     }
+
+
 }

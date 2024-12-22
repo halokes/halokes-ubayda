@@ -4,7 +4,7 @@
     <div class="app-brand demo">
         <a href="/" class="app-brand-link">
             <span class="app-brand-logo demo">
-                <img src="{{asset('assets/img/logo/logo.png')}}" style="width: 45px">
+                <img src="{{ asset('assets/img/logo/logo.png') }}" style="width: 45px">
             </span>
             <span class="app-brand-text demo menu-text fw-bolder ms-2">{{ config('app.name', 'SamLaravel') }}</span>
         </a>
@@ -13,6 +13,14 @@
             <i class="bx bx-chevron-left bx-sm align-middle"></i>
         </a>
     </div>
+
+    <div class="text-center text-white bg-secondary">
+        @if (!is_null(session('MY_ACTIVE_BUSINESS_NAME', null)))
+            <strong> {{ session('MY_ACTIVE_BUSINESS_NAME', null) }} </strong>
+        @endif
+    </div>
+
+
 
     <div class="menu-inner-shadow"></div>
 
