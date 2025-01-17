@@ -48,19 +48,25 @@ Route::middleware('auth')->group(function () {
 
             Route::prefix('/mybusiness')
                 ->group(function () {
-                    Route::get('/',     [BusinessUserController::class, 'indexUserBusiness'])->name('ubayda.business.user.index');
+                    Route::get('/',     [BusinessUserController::class, 'indexBusinessUser'])->name('ubayda.business.user.index');
 
-                    Route::get('/add',  [BusinessUserController::class, 'createUserBusiness'])->name('ubayda.business.user.add');
-                    Route::post('/add', [BusinessUserController::class, 'storeUserBusiness'])->name('ubayda.business.user.store');
+                    Route::get('/add',  [BusinessUserController::class, 'createBusinessUser'])->name('ubayda.business.user.add');
+                    Route::post('/add', [BusinessUserController::class, 'storeBusinessUser'])->name('ubayda.business.user.store');
 
-                    Route::get('/select/{id}', [BusinessUserController::class, 'selectUserBusiness'])->name('ubayda.business.user.select');
-                    Route::get('/{id}', [BusinessUserController::class, 'detailUserBusiness'])->name('ubayda.business.user.detail');
+                    // Route::get('/edit/{id}', [BusinessUserController::class, 'editBusinessUser'])->name('ubayda.business.user.edit');
+                    Route::get('/edit/{business}', [BusinessUserController::class, 'editBusinessUser'])
+                        ->middleware('can:updateBusinessUser,business')
+                        ->name('ubayda.business.user.edit');
 
-                    Route::get('/edit/{id}', [BusinessUserController::class, 'editUserBusiness'])->name('ubayda.business.user.edit');
-                    Route::put('/edit/{id}', [BusinessUserController::class, 'updateUserBusiness'])->name('ubayda.business.user.update');
+                    Route::put('/edit/{business}', [BusinessUserController::class, 'updateBusinessUser'])
+                        ->middleware('can:updateBusinessUser,business')
+                        ->name('ubayda.business.user.update');
 
-                    Route::get('/delete/{id}', [BusinessUserController::class, 'deleteConfirmUserBusiness'])->name('ubayda.business.user.delete');
-                    Route::delete('/delete/{id}', [BusinessUserController::class, 'destroyUserBusiness'])->name('ubayda.business.user.destroy');
+                    Route::get('/delete/{id}', [BusinessUserController::class, 'deleteConfirmBusinessUser'])->name('ubayda.business.user.delete');
+                    Route::delete('/delete/{id}', [BusinessUserController::class, 'destroyBusinessUser'])->name('ubayda.business.user.destroy');
+
+                    Route::get('/select/{id}', [BusinessUserController::class, 'selectBusinessUser'])->name('ubayda.business.user.select');
+                    Route::get('/{id}', [BusinessUserController::class, 'detailBusinessUser'])->name('ubayda.business.user.detail');
                 });
         });
 });

@@ -11,7 +11,7 @@ use App\Repositories\Ubayda\BusinessRepository;
 use App\Repositories\Ubayda\BusinessUserRepository;
 use Carbon\Carbon;
 
-class BusinessService
+class BusinessUserService
 {
     private $businessRepository;
     private $businessUserRepository;
@@ -51,17 +51,28 @@ class BusinessService
 
 
 
+
     /**
      * =============================================
      * process add new business to database
      * =============================================
      */
-    public function addNewBusiness(array $validatedData, $userId = null)
+    public function addNewBusinessUser(array $validatedData, $userId)
     {
         DB::beginTransaction();
         try {
-            //lets adjust the data here
+            //add into business table
             $business = $this->businessRepository->createBusiness($validatedData);
+
+            //add ownership
+            $ownershipdata = [
+                'user_id'   => $userId,
+                'business_id'   => $business->id,
+                'role'      => config('ubayda.UBAYDA_BUSINESS_OWNER'),
+                'last_selected' => Carbon::now()
+            ];
+            $this->businessUserRepository->createBusinessUser($ownershipdata);
+
             DB::commit();
             return $business;
         } catch (\Exception $exception) {
@@ -76,12 +87,12 @@ class BusinessService
      * process update business data
      * =============================================
      */
-    public function updateBusiness(array $validatedData, $id)
+    public function updateBusiness($businessId, array $validatedData, )
     {
         DB::beginTransaction();
         try {
 
-            $updatedBusiness = $this->businessRepository->updateBusiness($id, $validatedData);
+            $updatedBusiness = $this->businessRepository->updateBusiness($businessId, $validatedData);
 
             DB::commit();
             return $updatedBusiness;
@@ -92,6 +103,27 @@ class BusinessService
         }
     }
 
+/**
+     * =============================================
+     * process SELECT BUSINESS
+     * =============================================
+     */
+    public function selectBusinessUser($businessId, $userId, $role=null) : ?bool{
+
+        DB::beginTransaction();
+        try {
+
+            $updatedBusiness = $this->businessUserRepository->getBusinessUserByBusinessAndUser($businessId, $userId, $role)[0];
+            $this->businessUserRepository->updateBusinessUser($updatedBusiness->id, ["last_selected" => Carbon::now()]);
+
+            DB::commit();
+            return true;
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            Log::error("Failed to update data on last select business in the database: {$exception->getMessage()}");
+            return false;
+        }
+    }
 
     public function findLastSelectedBusiness($userId) : ?Business{
 

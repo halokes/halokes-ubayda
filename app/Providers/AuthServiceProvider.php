@@ -3,9 +3,13 @@
 namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
+
+use App\Models\Ubayda\Business;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use App\Notifications\CustomResetPassword;
+use App\Policies\Ubayda\BusinessUserPolicy;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\Log;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -16,6 +20,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
+        Business::class => BusinessUserPolicy::class,
     ];
 
     /**

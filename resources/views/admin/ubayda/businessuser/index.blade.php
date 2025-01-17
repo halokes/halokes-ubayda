@@ -99,7 +99,7 @@
                                         </td>
                                         <td>
                                             <a class="action-icon"
-                                                href="{{ route('ubayda.business.user.edit', ['id' => $business->id]) }}"
+                                                href="{{ route('ubayda.business.user.edit', ['business' => $business->id]) }}"
                                                 title="edit">
                                                 <i class='bx bx-pencil'></i>
                                             </a>

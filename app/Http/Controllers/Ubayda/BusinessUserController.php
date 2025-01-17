@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Ubayda;
 
 use App\Helpers\AlertHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Ubayda\BusinessUserAddRequest;
+use App\Http\Requests\Ubayda\BusinessUserEditRequest;
+use App\Models\Ubayda\Business;
 use App\Services\Ubayda\BusinessService;
+use App\Services\Ubayda\BusinessUserService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,22 +18,19 @@ use Illuminate\Support\Facades\Session;
 class BusinessUserController extends Controller
 {
     private $businessService;
+    private $businessUserService;
     private $mainBreadcrumbs;
-    private $userService;
     private $activeBusiness;
 
-    public function __construct(BusinessService $businessService, UserService $userService)
+    public function __construct(BusinessService $businessService, BusinessUserService $businessUserService)
     {
         $this->businessService = $businessService;
-        $this->userService = $userService;
+        $this->businessUserService = $businessUserService;
 
         // Store common breadcrumbs in the constructor
         $this->mainBreadcrumbs = [
-            'Businesss' => route('ubayda.business.admin.index'),
-            'Businesss' => route('ubayda.business.admin.index'),
+            'My Businesss' => route('ubayda.business.user.index'),
         ];
-
-
     }
 
     /**
@@ -42,7 +43,7 @@ class BusinessUserController extends Controller
      *      list of all business owned by me
      * =============================================
      */
-    public function indexUserBusiness(Request $request)
+    public function indexBusinessUser(Request $request)
     {
 
         $userId = Auth::user()->id;
@@ -54,11 +55,11 @@ class BusinessUserController extends Controller
 
         $alerts = AlertHelper::getAlerts();
 
-         //check and or set the session
-         $activeBusiness = Session::get('MY_ACTIVE_BUSINESS', null);
-         Log::debug("isinya activeBusiness ".$activeBusiness);
+        //check and or set the session
+        $activeBusiness = Session::get('MY_ACTIVE_BUSINESS', null);
+        // Log::debug("isinya activeBusiness " . $activeBusiness);
 
-        return view('admin.ubayda.business.user.index', compact('businesses', 'breadcrumbs', 'alerts', 'activeBusiness'));
+        return view('admin.ubayda.businessuser.index', compact('businesses', 'breadcrumbs', 'alerts', 'activeBusiness'));
     }
 
     /**
@@ -66,7 +67,8 @@ class BusinessUserController extends Controller
      *      list of all business owned by me
      * =============================================
      */
-    public function selectUserBusiness(Request $request){
+    public function selectBusinessUser(Request $request)
+    {
         $businessId = $request->id;
 
 
@@ -78,17 +80,89 @@ class BusinessUserController extends Controller
             Session::put('MY_ACTIVE_BUSINESS_NAME', $business->name);
 
             //save the log
-            $this->businessService->selectUserBusiness($businessId, Auth::user()->id);
+            $this->businessUserService->selectBusinessUser($businessId, Auth::user()->id);
 
 
             $alert = AlertHelper::createAlert('success', 'Success select Business with Name : ' . $business->name);
-
         } else {
             $alert = AlertHelper::createAlert('danger', 'Error : Cannot Select Business, Oops! no such data with that ID : ' . $request->id);
-
         }
 
 
         return redirect()->route('ubayda.business.user.index')->with('alerts', [$alert]);
+    }
+
+    /**
+     * =============================================
+     *      ADD NEW BUSINESS - display Form
+     * =============================================
+     */
+    public function createBusinessUser(Request $request)
+    {
+        $breadcrumbs = array_merge($this->mainBreadcrumbs, ['Add' => null]);
+        $listType = config('ubayda.BUSINESS_TYPE');
+
+        return view('admin.ubayda.businessuser.add', compact('breadcrumbs', 'listType'));
+    }
+
+    /**
+     * =============================================
+     *      ADD NEW BUSINESS - store data
+     * =============================================
+     */
+    public function storeBusinessUser(BusinessUserAddRequest $request)
+    {
+        $validatedData = $request->validated();
+
+        $result = $this->businessUserService->addNewBusinessUser($validatedData, $request->user()->id);
+
+        $alert = $result
+            ? AlertHelper::createAlert('success', 'Data ' . $result->name . ' successfully added')
+            : AlertHelper::createAlert('danger', 'Data ' . $request->name . ' failed to be added');
+
+
+
+        return redirect()->route('ubayda.business.user.index')->with([
+            'alerts'        => [$alert]
+        ]);
+    }
+
+    /**
+     * =============================================
+     *      EDIT THE BUSINESS - show form
+     * =============================================
+     */
+    public function editBusinessUser(Business $business)
+    {
+        // dd($business);
+        $breadcrumbs = array_merge($this->mainBreadcrumbs, ['Edit' => null]);
+        $listType = config('ubayda.BUSINESS_TYPE');
+
+        return view('admin.ubayda.businessuser.edit', compact('breadcrumbs', 'listType', 'business'));
+    }
+
+
+    /**
+     * =============================================
+     *      EDIT THE BUSINESS - show form
+     * =============================================
+     */
+    public function updateBusinessUser(Business $business, BusinessUserEditRequest $request)
+    {
+
+        // dd($business->id);
+        //to do here
+        $validatedData = $request->validated();
+
+        $result = $this->businessUserService->updateBusiness($business->id, $validatedData);
+
+        $alert = $result
+            ? AlertHelper::createAlert('success', 'Data business ' . $result->name . ' successfully edited')
+            : AlertHelper::createAlert('danger', 'Data business ' . $request->name . ' failed to be edited');
+
+
+        return redirect()->route('ubayda.business.user.index')->with([
+            'alerts'        => [$alert]
+        ]);
     }
 }

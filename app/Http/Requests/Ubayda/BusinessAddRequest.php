@@ -23,10 +23,10 @@ class BusinessAddRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required',
-            'address' => 'required',
+            'name' => 'required|string',
+            'address' => 'required|string',
             'type' => 'required',
-            'is_active' => 'nullable|boolean',
+            'is_active' => 'nullable|boolean|default:true',
         ];
     }
 
@@ -38,9 +38,9 @@ class BusinessAddRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'The user field is required.',
-            'address.required' => 'The package field is required.',
-            'type.required' => 'The package field is required.',
+            'name.required' => 'The name field is required.',
+            'address.required' => 'The address field is required.',
+            'type.required' => 'The type field is required.',
         ];
     }
 }

@@ -22,7 +22,12 @@ class Business extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'business_user')
-                    ->withPivot('role')
-                    ->withTimestamps();
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'id';
     }
 }
