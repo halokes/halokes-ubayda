@@ -25,6 +25,11 @@ class DatabaseSeeder extends Seeder
             SubscriptionMasterSeeder::class,
             SubscriptionUserSeeder::class,
             SubscriptionHistorySeeder::class,
+
+            //Ubayda related
+            BusinessSeeder::class,
+
+
         ]);
     }
 }

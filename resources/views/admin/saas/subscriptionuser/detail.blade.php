@@ -112,10 +112,17 @@
                         <i class='tf-icons bx bx-play me-2'></i>Unsuspend</a>
                 @endif
 
-                {{-- NEW SUBSCRIPTION BUTTON --}}
+                {{-- SEE USER SUBSCRIPTION --}}
                 <a class="btn btn-success me-2" href="{{ route('subscription.user.add', ['user' => $data->user_id]) }}"
                     title="Suspend user">
-                    <i class='tf-icons bx bx-plus me-2'></i>New Subscription</a>
+                    <i class='tf-icons bx bx-plus me-2'></i>New Subscription
+                </a>
+
+                {{-- SEE USER BUSINESS OWNERSHIP --}}
+                <a class="btn btn-success me-2" href="{{ route('subscription.user.add', ['user' => $data->user_id]) }}"
+                    title="Suspend user">
+                    <i class='tf-icons bx bx-plus me-2'></i>See Busienss
+                </a>
 
             </div>
 

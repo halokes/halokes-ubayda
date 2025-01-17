@@ -94,6 +94,10 @@
                 <a class="btn btn-dark me-2" href="{{ route('subscription.user.index', ['userId' => $data->id]) }}"
                     title="show subscription">
                     <i class='tf-icons bx bx-receipt me-2'></i>See Subscription</a>
+
+                <a class="btn btn-dark me-2" href="{{ route('ubayda.business.admin.index', ['userId' => $data->id]) }}"
+                    title="show business ownership">
+                    <i class='tf-icons bx bx-briefcase me-2'></i>See Owned Business</a>
             </div>
 
         </div>

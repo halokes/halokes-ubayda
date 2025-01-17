@@ -1,6 +1,6 @@
 @extends('admin/template-base')
 
-@section('page-title', 'List of Packages')
+@section('page-title', 'List of Businesss')
 
 {{-- MAIN CONTENT PART --}}
 @section('main-content')
@@ -17,12 +17,12 @@
             <div class="d-flex justify-content-between">
 
                 <div class="p-2 bd-highlight">
-                    <h3 class="card-header">List of Package</h3>
+                    <h3 class="card-header">List of Business</h3>
                 </div>
                 <div class="p-2">
-                    <a class="btn btn-primary" href="{{ route('subscription.packages.add') }}">
+                    <a class="btn btn-primary" href="{{ route('ubayda.business.admin.add') }}">
                         <span class="tf-icons bx bx-plus"></span>&nbsp;
-                        Add New Package
+                        Add New Business
                     </a>
                 </div>
 
@@ -41,7 +41,7 @@
                     <form action="{{ url()->full() }}" method="get" class="d-flex align-items-center">
                         <i class="bx bx-search fs-4 lh-0"></i>
                         <input type="text" class="form-control border-1 shadow-none bg-light bg-gradient"
-                            placeholder="Search id, alias, name, description, price.." aria-label="Search id, alias, name, description, price..." name="keyword"
+                            placeholder="Search name or address.." aria-label="Search name or address..." name="keyword"
                             value="{{ isset($keyword) ? $keyword : '' }}" />
                         <input type="hidden" name="sort_order" value="{{ request()->input('sort_order') }}" />
                         <input type="hidden" name="sort_field" value="{{ request()->input('sort_field') }}" />
@@ -67,63 +67,58 @@
                             <th>
                                 No
                             </th>
-                            <th>
+                            <th
+                                style="max-width: 250px; word-wrap: break-word; white-space: normal; overflow-wrap: break-word;">
                                 <a
-                                    href="{{ route('subscription.packages.index', [
-                                        'sort_field' => 'id',
+                                    href="{{ route('ubayda.business.admin.index', [
+                                        'sort_field' => 'name',
                                         'sort_order' => $sortOrder == 'asc' ? 'desc' : 'asc',
                                         'keyword' => $keyword,
                                     ]) }}">
-                                    Id
+                                    Business Name
+                                    @include('components.arrow-sort', [
+                                        'field' => 'name',
+                                        'sortField' => $sortField,
+                                        'sortOrder' => $sortOrder,
+                                    ])
+                                </a>
+                            </th>
+                            <th
+                                style="max-width: 300px; word-wrap: break-word; white-space: normal; overflow-wrap: break-word;">
+                                <a
+                                    href="{{ route('ubayda.business.admin.index', [
+                                        'sort_field' => 'address',
+                                        'sort_order' => $sortOrder == 'asc' ? 'desc' : 'asc',
+                                        'keyword' => $keyword,
+                                    ]) }}">
+                                    Business Address
+                                    @include('components.arrow-sort', [
+                                        'field' => 'address',
+                                        'sortField' => $sortField,
+                                        'sortOrder' => $sortOrder,
+                                    ])
                                 </a>
                             </th>
                             <th>
                                 <a
-                                    href="{{ route('subscription.packages.index', [
-                                        'sort_field' => 'alias',
-                                        'sort_order' => $sortOrder == 'asc' ? 'desc' : 'asc',
-                                        'keyword' => $keyword,
-                                    ]) }}">
-                                    Alias
-                                </a>
-                            </th>
-
-                            <th>
-                                <a
-                                    href="{{ route('subscription.packages.index', [
-                                        'sort_field' => 'package_name',
-                                        'sort_order' => $sortOrder == 'asc' ? 'desc' : 'asc',
-                                        'keyword' => $keyword,
-                                    ]) }}">
-                                    Package Name
+                                    href="{{ route('ubayda.business.admin.index', ['sort_field' => 'type', 'sort_order' => $sortOrder == 'asc' ? 'desc' : 'asc', 'keyword' => $keyword]) }}">
+                                    Business Type
+                                    @include('components.arrow-sort', [
+                                        'field' => 'type',
+                                        'sortField' => $sortField,
+                                        'sortOrder' => $sortOrder,
+                                    ])
                                 </a>
                             </th>
                             <th>
                                 <a
-                                    href="{{ route('subscription.packages.index', [
-                                        'sort_field' => 'package_description',
-                                        'sort_order' => $sortOrder == 'asc' ? 'desc' : 'asc',
-                                        'keyword' => $keyword,
-                                    ]) }}">
-                                    Package Description
-                                </a>
-                            </th>
-                            <th><a
-                                    href="{{ route('subscription.packages.index', [
-                                            'sort_field' => 'is_active',
-                                            'sort_order' => $sortOrder == 'asc' ? 'desc' : 'asc',
-                                            'keyword' => $keyword
-                                        ]) }}">
-                                    Is Active
-                                </a></th>
-                            <th>
-                                <a
-                                    href="{{ route('subscription.packages.index', [
-                                        'sort_field' => 'package_price',
-                                        'sort_order' => $sortOrder == 'asc' ? 'desc' : 'asc',
-                                        'keyword' => $keyword,
-                                    ]) }}">
-                                    Price ({{config('saas.CURRENCY_SYMBOL')}})
+                                    href="{{ route('ubayda.business.admin.index', ['sort_field' => 'owner_email', 'sort_order' => $sortOrder == 'asc' ? 'desc' : 'asc', 'keyword' => $keyword]) }}">
+                                    Owner
+                                    @include('components.arrow-sort', [
+                                        'field' => 'owner_email',
+                                        'sortField' => $sortField,
+                                        'sortOrder' => $sortOrder,
+                                    ])
                                 </a>
                             </th>
                             <th></th>
@@ -137,38 +132,43 @@
                         @php
                             $startNumber = $perPage * ($page - 1) + 1;
                         @endphp
-                        @foreach ($packages as $package)
+                        @foreach ($businesses as $business)
                             <tr>
                                 <td>{{ $startNumber++ }}</td>
-                                <td>{{ $package->id }}</td>
-                                <td>{{ $package->alias }}</td>
-                                <td>{{ $package->package_name }}</td>
-                                <td>{{ $package->package_description }}</td>
+                                <td style="max-width: 250px; overflow-wrap: break-word; white-space: normal;">
+                                    {{ $business->name }}</td>
+                                <td style="max-width: 300px; overflow-wrap: break-word; white-space: normal;">
+                                    {{ $business->address }}
+                                </td>
+                                <td>{{ $business->type }}</td>
                                 <td>
-                                    @if ($package->is_active)
-                                        <span class="badge rounded-pill bg-success"> Yes </span>
+                                    @if ($business->owner_id)
+                                        <a href="{{ route('admin.user.detail', ['id' => $business->owner_id]) }}"
+                                            target="_blank">
+                                            {{ $business->owner_email }}
+                                        </a>
                                     @else
-                                        <span class="badge rounded-pill bg-danger"> No </span>
+                                        <span>N/A</span>
                                     @endif
                                 </td>
-                                <td class="text-end">{{$package->package_price}}</td>
-
 
                                 {{-- ============ CRUD LINK ICON =============  --}}
                                 <td>
-                                    <a class="action-icon" href="{{ route('subscription.packages.detail', ['id' => $package->id]) }}"
+                                    <a class="action-icon"
+                                        href="{{ route('ubayda.business.admin.detail', ['id' => $business->id]) }}"
                                         title="detail">
                                         <i class='bx bx-search'></i>
                                     </a>
                                 </td>
                                 <td>
-                                    <a class="action-icon" href="{{ route('subscription.packages.edit', ['id' => $package->id]) }}"
-                                        title="edit">
+                                    <a class="action-icon"
+                                        href="{{ route('ubayda.business.admin.edit', ['id' => $business->id]) }}" title="edit">
                                         <i class='bx bx-pencil'></i>
                                     </a>
                                 </td>
                                 <td>
-                                    <a class="action-icon" href="{{ route('subscription.packages.delete', ['id' => $package->id]) }}"
+                                    <a class="action-icon"
+                                        href="{{ route('ubayda.business.admin.delete', ['id' => $business->id]) }}"
                                         title="delete">
                                         <i class='bx bx-trash'></i>
                                     </a>
@@ -182,15 +182,9 @@
 
                 <div class="row">
                     <div class="col-md-10 mx-auto">
-                        {{ $packages->onEachSide(5)->links('admin.components.paginator.default') }}
+                        {{ $businesses->onEachSide(5)->links('admin.components.paginator.default') }}
                     </div>
                 </div>
-
-
-
-
-
-
 
 
             </div>
