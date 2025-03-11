@@ -48,7 +48,7 @@ Route::middleware('auth')->group(function () {
 
             Route::prefix('/mybusiness')
                 ->group(function () {
-                    Route::get('/',     [BusinessUserController::class, 'indexBusinessUser'])->name('ubayda.business.user.index');
+                    Route::get('/list',     [BusinessUserController::class, 'indexBusinessUser'])->name('ubayda.business.user.index');
 
                     Route::get('/add',  [BusinessUserController::class, 'createBusinessUser'])->name('ubayda.business.user.add');
                     Route::post('/add', [BusinessUserController::class, 'storeBusinessUser'])->name('ubayda.business.user.store');
