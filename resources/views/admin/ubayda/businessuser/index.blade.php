@@ -64,6 +64,7 @@
                                 </th>
                                 <th></th>
                                 <th></th>
+                                <th></th>
                             </tr>
                         </thead>
 
@@ -91,11 +92,18 @@
                                             @else
                                                 <a class="action-icon btn btn-primary text-white"
                                                     href="{{ route('ubayda.business.user.select', ['id' => $business->id]) }}"
-                                                    title="detail">
+                                                    title="switch">
                                                     <i class='bx bx-search text-white'></i>
                                                     Switch to This Business
                                                 </a>
                                             @endif
+                                        </td>
+                                        <td>
+                                            <a class="action-icon"
+                                                href="{{ route('ubayda.business.user.detail', ['id' => $business->id]) }}"
+                                                title="view">
+                                                <i class='bx bx-show'></i>
+                                            </a>
                                         </td>
                                         <td>
                                             <a class="action-icon"
@@ -158,6 +166,7 @@
                                 </th>
                                 <th>Role</th>
                                 <th></th>
+                                <th></th>
                             </tr>
                         </thead>
 
@@ -188,11 +197,18 @@
                                             @else
                                                 <a class="action-icon btn btn-primary text-white"
                                                     href="{{ route('ubayda.business.user.select', ['id' => $business->id]) }}"
-                                                    title="detail">
+                                                    title="switch">
                                                     <i class='bx bx-search text-white'></i>
                                                     Switch to This Business
                                                 </a>
                                             @endif
+                                        </td>
+                                        <td>
+                                            <a class="action-icon"
+                                                href="{{ route('ubayda.business.user.detail', ['id' => $business->id]) }}"
+                                                title="view">
+                                                <i class='bx bx-show'></i>
+                                            </a>
                                         </td>
                                     </tr>
                                 @endif

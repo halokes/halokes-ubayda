@@ -66,7 +66,9 @@ Route::middleware('auth')->group(function () {
                     Route::delete('/delete/{id}', [BusinessUserController::class, 'destroyBusinessUser'])->name('ubayda.business.user.destroy');
 
                     Route::get('/select/{id}', [BusinessUserController::class, 'selectBusinessUser'])->name('ubayda.business.user.select');
-                    Route::get('/{id}', [BusinessUserController::class, 'detailBusinessUser'])->name('ubayda.business.user.detail');
+
+                    Route::get('/detail/{id}', [BusinessUserController::class, 'detailBusinessUser'])
+                        ->name('ubayda.business.user.detail');
                 });
         });
 });

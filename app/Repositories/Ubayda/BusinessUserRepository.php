@@ -32,8 +32,12 @@ class BusinessUserRepository
         return BusinessUser::where('business_id', $businessId)->where('user_id', $userId)->get();
     }
 
-    public function createBusinessUser($data)
+    public function createBusinessUser($data, $userId = null)
     {
+        if ($userId !== null) {
+            $data['created_by'] = $userId;
+            $data['updated_by'] = $userId;
+        }
         return BusinessUser::create($data);
     }
 

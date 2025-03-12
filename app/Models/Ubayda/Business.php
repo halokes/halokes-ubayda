@@ -17,7 +17,8 @@ class Business extends Model
     public $incrementing = false;
     protected $table = 'business';
 
-    protected $fillable = ['name', 'address', 'type'];
+    protected $fillable = ['name', 'address', 'type', 'created_by',
+        'updated_by'];
 
     public function users(): BelongsToMany
     {

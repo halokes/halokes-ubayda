@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Ubayda;
 
 use App\Helpers\AlertHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Ubayda\BusinessAddRequest;
 use App\Http\Requests\Ubayda\BusinessFindUserRequest;
 use App\Http\Requests\Ubayda\BusinessListRequest;
 use App\Services\Ubayda\BusinessService;

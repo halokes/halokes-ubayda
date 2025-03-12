@@ -154,7 +154,7 @@ class BusinessUserController extends Controller
         //to do here
         $validatedData = $request->validated();
 
-        $result = $this->businessUserService->updateBusiness($business->id, $validatedData);
+        $result = $this->businessUserService->updateBusiness($business->id, $validatedData, $request->user()->id);
 
         $alert = $result
             ? AlertHelper::createAlert('success', 'Data business ' . $result->name . ' successfully edited')
@@ -164,5 +164,40 @@ class BusinessUserController extends Controller
         return redirect()->route('ubayda.business.user.index')->with([
             'alerts'        => [$alert]
         ]);
+    }
+
+    /**
+     * =============================================
+     *      DETAIL OF BUSINESS - show detail
+     * =============================================
+     */
+    public function detailBusinessUser(Request $request, $id)
+    {
+        $userId = Auth::user()->id;
+
+        // Get business details
+        $data = $this->businessService->getBusinessDetail($id);
+
+        if (!$data) {
+            $alert = AlertHelper::createAlert('danger', 'Business not found');
+            return redirect()->route('ubayda.business.user.index')->with([
+                'alerts' => [$alert]
+            ]);
+        }
+
+        // Check if user has access to this business using the policy
+        if (!$request->user()->can('viewBusinessUser', $data)) {
+            $alert = AlertHelper::createAlert('danger', 'You do not have access to view this business');
+            return redirect()->route('ubayda.business.user.index')->with([
+                'alerts' => [$alert]
+            ]);
+        }
+
+        // Get business owners (users with OWNER role)
+        $owners = $this->businessUserService->getBusinessOwners($id);
+
+        $breadcrumbs = array_merge($this->mainBreadcrumbs, ['Detail' => null]);
+
+        return view('admin.ubayda.businessuser.detail', compact('data', 'owners', 'breadcrumbs'));
     }
 }

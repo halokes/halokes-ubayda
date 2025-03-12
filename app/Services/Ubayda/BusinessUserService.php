@@ -62,7 +62,7 @@ class BusinessUserService
         DB::beginTransaction();
         try {
             //add into business table
-            $business = $this->businessRepository->createBusiness($validatedData);
+            $business = $this->businessRepository->createBusiness($validatedData, $userId);
 
             //add ownership
             $ownershipdata = [
@@ -87,12 +87,12 @@ class BusinessUserService
      * process update business data
      * =============================================
      */
-    public function updateBusiness($businessId, array $validatedData, )
+    public function updateBusiness($businessId, array $validatedData, $userId = null )
     {
         DB::beginTransaction();
         try {
 
-            $updatedBusiness = $this->businessRepository->updateBusiness($businessId, $validatedData);
+            $updatedBusiness = $this->businessRepository->updateBusiness($businessId, $validatedData, $userId);
 
             DB::commit();
             return $updatedBusiness;
@@ -189,6 +189,53 @@ class BusinessUserService
             DB::rollBack();
             Log::error("Failed to delete business with id $businessId: {$exception->getMessage()}");
             return false;
+        }
+    }
+
+    /**
+     * =============================================
+     * Check if a user has access to a business
+     * =============================================
+     */
+    public function userHasAccessToBusiness($businessId, $userId): bool
+    {
+        try {
+            $businessUsers = $this->businessUserRepository->getBusinessUserByBusinessAndUser($businessId, $userId);
+            return count($businessUsers) > 0;
+        } catch (\Exception $exception) {
+            Log::error("Failed to check user access to business: {$exception->getMessage()}");
+            return false;
+        }
+    }
+
+    /**
+     * =============================================
+     * Get all owners of a business
+     * =============================================
+     */
+    public function getBusinessOwners($businessId)
+    {
+        try {
+            $ownerRole = config('ubayda.UBAYDA_BUSINESS_OWNER');
+
+            // Get all business users with owner role
+            $businessUsers = BusinessUser::where('business_id', $businessId)
+                ->where('role', $ownerRole)
+                ->with('user') // Eager load the user relationship
+                ->get();
+
+            // Extract user information
+            $owners = [];
+            foreach ($businessUsers as $businessUser) {
+                if (isset($businessUser->user)) {
+                    $owners[] = $businessUser->user;
+                }
+            }
+
+            return $owners;
+        } catch (\Exception $exception) {
+            Log::error("Failed to get business owners: {$exception->getMessage()}");
+            return [];
         }
     }
 }

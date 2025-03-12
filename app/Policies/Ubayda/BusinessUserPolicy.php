@@ -34,7 +34,15 @@ class BusinessUserPolicy
     {
         return $business->users()
             ->where('user_id', $user->id)
-            ->wherePivot('role', 'owner')
+            ->wherePivot('role', config('ubayda.UBAYDA_BUSINESS_OWNER'))
+            ->exists();
+    }
+
+    public function viewBusinessUser(User $user, Business $business)
+    {
+        // User can view business details if they have any role in the business
+        return $business->users()
+            ->where('user_id', $user->id)
             ->exists();
     }
 }

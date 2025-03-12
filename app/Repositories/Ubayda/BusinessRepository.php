@@ -26,7 +26,7 @@ class BusinessRepository
             ->leftJoin('users', 'business_user.user_id', '=', 'users.id') // Join with the users table
             ->select('business.*', 'users.id as owner_id', 'users.name as owner_name', 'users.email as owner_email', 'business_user.role'); // Select owner details
 
-        if($isOwner){
+        if ($isOwner) {
             $queryResult->where('business_user.role', '=', 'owner');
         }
 
@@ -36,7 +36,7 @@ class BusinessRepository
             $queryResult->orderBy("created_at", "desc");
         }
 
-        if(!is_null($userId)){
+        if (!is_null($userId)) {
             $queryResult->where('users.id', $userId);
         }
 
@@ -47,7 +47,7 @@ class BusinessRepository
                 ->orWhereRaw('lower(address) LIKE ?', ['%' . strtolower($keyword) . '%'])
                 ->orWhereRaw('lower(type) LIKE ?', ['%' . strtolower($keyword) . '%']);
 
-            if(!$isOwner){
+            if (!$isOwner) {
                 $queryResult->orWhereRaw('lower(business_user.role) LIKE ?', ['%' . strtolower($keyword) . '%']);
             }
 
@@ -79,18 +79,28 @@ class BusinessRepository
         return Business::find($id);
     }
 
-    public function createBusiness($data)
+    public function createBusiness($data, $userId = null)
     {
+        if ($userId !== null) {
+            $data['created_by'] = $userId;
+            $data['updated_by'] = $userId;
+        }
+
         return Business::create($data);
     }
 
-    public function updateBusiness($id, $data)
+
+    public function updateBusiness($id, $data, $userId = null)
     {
         // Find the data based on the id
         $updatedData = Business::where('id', $id)->first();
 
         // if business data with such id exists
         if ($updatedData) {
+            if ($userId !== null) {
+                $data['updated_by'] = $userId;
+            }
+            // dd($data);
             // Update the business with the provided data
             $updatedData->update($data);
             return $updatedData;
