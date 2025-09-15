@@ -189,122 +189,126 @@ class BusinessController extends Controller
         $result = $this->businessService->addNewBusiness($validatedData);
 
         $alert = $result
-            ? AlertHelper::createAlert('success', 'Data ' . $result->business_name . ' successfully added')
-            : AlertHelper::createAlert('danger', 'Data ' . $result->business_name . ' failed to be added');
+            ? AlertHelper::createAlert('success', 'Data ' . $result->name . ' successfully added')
+            : AlertHelper::createAlert('danger', 'Data failed to be added');
 
-        return redirect()->route('subscription.business.index')->with([
+        return redirect()->route('ubayda.business.admin.index')->with([
             'alerts'        => [$alert],
             'sort_order'    => 'desc'
         ]);
     }
 
-    // /**
-    //  * =============================================
-    //  *      see the detail of single business entity
-    //  * =============================================
-    //  */
-    // public function detail(Request $request)
-    // {
-    //     $data = $this->businessService->getBusinessDetail($request->id);
+    /**
+     * =============================================
+     *      see the detail of single business entity
+     * =============================================
+     */
+    public function detail(Request $request)
+    {
+        $data = $this->businessService->getBusinessDetail($request->id);
 
-    //     // dd($data);
-    //     if($data){
-    //         $breadcrumbs = array_merge($this->mainBreadcrumbs, ['Detail' => null]);
+        // dd($data);
+        if($data){
+            $breadcrumbs = array_merge($this->mainBreadcrumbs, ['Detail' => null]);
 
-    //         return view('admin.ubayda.businessdetail', compact('breadcrumbs', 'data'));
-    //     }
-    //     else{
-    //         $alert = AlertHelper::createAlert('danger', 'Error : Cannot View Detail, Oops! no such data with that ID : ' . $request->id);
+            return view('admin.ubayda.business.admin.detail', compact('breadcrumbs', 'data'));
+        }
+        else{
+            $alert = AlertHelper::createAlert('danger', 'Error : Cannot View Detail, Oops! no such data with that ID : ' . $request->id);
 
-    //         return redirect()->route('subscription.business.index')->with('alerts', [$alert]);
-    //     }
+            return redirect()->route('ubayda.business.admin.index')->with('alerts', [$alert]);
+        }
+    }
 
+    /**
+     * =============================================
+     *     display "edit business" pages
+     * =============================================
+     */
+    public function edit(Request $request, $id)
+    {
+        $business = $this->businessService->getBusinessDetail($id);
+        $listType = config('ubayda.BUSINESS_TYPE');
 
-    // }
+        if ($business) {
+            $breadcrumbs = array_merge($this->mainBreadcrumbs, ['Edit' => null]);
 
-    // /**
-    //  * =============================================
-    //  *     display "edit business" pages
-    //  * =============================================
-    //  */
-    // public function edit(Request $request, $id)
-    // {
-    //     $business = $this->businessService->getBusinessDetail($id);
+            return view('admin.ubayda.business.admin.edit', compact('breadcrumbs', 'business', 'listType'));
+        } else {
+            $alert = AlertHelper::createAlert('danger', 'Error : Cannot edit, Oops! no such data with that ID : ' . $request->id);
 
-    //     if ($business) {
-    //         $breadcrumbs = array_merge($this->mainBreadcrumbs, ['Edit' => null]);
+            return redirect()->route('ubayda.business.admin.index')->with('alerts', [$alert]);
+        }
+    }
 
-    //         return view('admin.ubayda.businessedit', compact('breadcrumbs', 'business'));
-    //     } else {
-    //         $alert = AlertHelper::createAlert('danger', 'Error : Cannot edit, Oops! no such data with that ID : ' . $request->id);
+    /**
+     * =============================================
+     *      process "edit business" from previous form
+     * =============================================
+     */
+    public function update(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string',
+            'type' => 'required|string',
+        ]);
 
-    //         return redirect()->route('subscription.business.index')->with('alerts', [$alert]);
-    //     }
-    // }
+        $result = $this->businessService->updateBusiness($validatedData, $id);
 
-    // /**
-    //  * =============================================
-    //  *      process "edit business" from previous form
-    //  * =============================================
-    //  */
-    // public function update(BusinessEditRequest $request, $id)
-    // {
-    //     $result = $this->businessService->updateBusiness($request->validated(), $id);
+        $alert = $result
+            ? AlertHelper::createAlert('success', 'Business ' . $result->name . ' successfully updated')
+            : AlertHelper::createAlert('danger', 'Business failed to be updated');
 
+        return redirect()->route('ubayda.business.admin.index')->with([
+            'alerts' => [$alert],
+            'sort_field' => 'updated_at',
+            'sort_order' => 'desc'
+        ]);
+    }
 
-    //     $alert = $result
-    //         ? AlertHelper::createAlert('success', 'Business ' . $result->alias . ' successfully updated')
-    //         : AlertHelper::createAlert('danger', 'Business ' . $request->alias . ' failed to be updated');
+    /**
+     * =============================================
+     *    show delete confirmation for business
+     *    while showing the details to make sure
+     *    it is correct data which they want to delete
+     * =============================================
+     */
+    public function deleteConfirm(Request $request, $id)
+    {
+        $isDeleteable = $this->businessService->isDeleteable($id);
+        $data = $this->businessService->getBusinessDetail($id);
+        if ($data) {
+            $breadcrumbs = array_merge($this->mainBreadcrumbs, ['Delete' => null]);
+            return view('admin.ubayda.business.admin.delete-confirm', compact('breadcrumbs', 'data', 'isDeleteable'));
+        } else {
+            $alert = AlertHelper::createAlert('danger', 'Error : Cannot delete, Oops! no such data with that ID : ' . $id);
 
-    //     return redirect()->route('subscription.business.index')->with([
-    //         'alerts' => [$alert],
-    //         'sort_field' => 'updated_at',
-    //         'sort_order' => 'desc'
-    //     ]);
-    // }
+            return redirect()->route('ubayda.business.admin.index')->with('alerts', [$alert]);
+        }
+    }
 
-    // /**
-    //  * =============================================
-    //  *    show delete confirmation for business
-    //  *    while showing the details to make sure
-    //  *    it is correct data which they want to delete
-    //  * =============================================
-    //  */
-    // public function deleteConfirm(BusinessListRequest $request)
-    // {
-    //     $isDeleteable = $this->businessService->isDeleteable($request->id);
-    //     $data = $this->businessService->getBusinessDetail($request->id);
-    //     if ($data) {
-    //         $breadcrumbs = array_merge($this->mainBreadcrumbs, ['Delete' => null]);
-    //         return view('admin.ubayda.businessdelete-confirm', compact('breadcrumbs', 'data', 'isDeleteable'));
-    //     } else {
-    //         $alert = AlertHelper::createAlert('danger', 'Error : Cannot delete, Oops! no such data with that ID : ' . $request->id);
+    /**
+     * =============================================
+     *      process delete data
+     * =============================================
+     */
+    public function destroy(Request $request, $id)
+    {
+        $business = $this->businessService->getBusinessDetail($id);
 
-    //         return redirect()->route('subscription.business.index')->with('alerts', [$alert]);
-    //     }
-    // }
+        if (!is_null($business)) {
+            $result = $this->businessService->deleteBusiness($id);
+        } else {
+            $result = false;
+        }
 
-    // /**
-    //  * =============================================
-    //  *      process delete data
-    //  * =============================================
-    //  */
-    // public function destroy(BusinessListRequest $request)
-    // {
-    //     $business = $this->businessService->getBusinessDetail($request->id);
+        $alert = $result
+            ? AlertHelper::createAlert('success', 'Data ' . $business->name . ' successfully deleted')
+            : AlertHelper::createAlert('danger', 'Oops! failed to be deleted');
 
-    //     if (!is_null($business)) {
-    //         $result = $this->businessService->deleteBusiness($request->id);
-    //     } else {
-    //         $result = false;
-    //     }
-
-    //     $alert = $result
-    //         ? AlertHelper::createAlert('success', 'Data ' . $business->alias . ' successfully deleted')
-    //         : AlertHelper::createAlert('danger', 'Oops! failed to be deleted');
-
-    //     return redirect()->route('subscription.business.index')->with('alerts', [$alert]);
-    // }
+        return redirect()->route('ubayda.business.admin.index')->with('alerts', [$alert]);
+    }
 
 
 

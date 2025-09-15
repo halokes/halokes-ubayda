@@ -1,7 +1,7 @@
 {{-- SAAS MENU -- ADMIN ONLY --}}
 @if (auth()->user()->hasRole('ROLE_ADMIN'))
     {{-- EXAMPLE MENU HEADER FOR GROUPING --}}
-    @include('admin.components.sidebar.menu-header', ['textMenuHeader' => 'Ubayda Related'])
+    @include('admin.components.sidebar.menu-header', ['textMenuHeader' => 'Admin Ubayda Related'])
 
     {{-- PACKAGE MENU --}}
     {{-- EXAMPLE MENU WITH SUB MENU --}}
@@ -12,7 +12,7 @@
         'menuIcon' => 'bx bx-briefcase', //check here for the icons https://boxicons.com/cheatsheet
         'subMenuData' => [
             [
-                'subMenuText' => 'Business',
+                'subMenuText' => 'Registered Business',
                 'subMenuUrl' => route('ubayda.business.admin.index'),
             ],
         ],

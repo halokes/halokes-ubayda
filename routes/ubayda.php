@@ -28,8 +28,6 @@ Route::middleware('auth')->group(function () {
                     Route::get('/add',  [BusinessController::class, 'create'])->name('ubayda.business.admin.add');
                     Route::post('/add', [BusinessController::class, 'store'])->name('ubayda.business.admin.store');
 
-                    Route::get('/{id}', [BusinessController::class, 'detailAdmin'])->name('ubayda.business.admin.detail');
-
                     Route::get('/suspend/{id}', [BusinessController::class, 'suspendAdmin'])->name('ubayda.business.admin.suspend');
                     Route::get('/unsuspend/{id}', [BusinessController::class, 'unsuspendAdmin'])->name('ubayda.business.admin.unsuspend');
 
@@ -38,6 +36,9 @@ Route::middleware('auth')->group(function () {
 
                     Route::get('/delete/{id}', [BusinessController::class, 'deleteConfirm'])->name('ubayda.business.admin.delete');
                     Route::delete('/delete/{id}', [BusinessController::class, 'destroy'])->name('ubayda.business.admin.destroy');
+
+                    // This generic route should be last to avoid conflicts
+                    Route::get('/{id}', [BusinessController::class, 'detailAdmin'])->name('ubayda.business.admin.detail');
                 });
         });
 
@@ -62,11 +63,16 @@ Route::middleware('auth')->group(function () {
                         ->middleware('can:updateBusinessUser,business')
                         ->name('ubayda.business.user.update');
 
-                    Route::get('/delete/{id}', [BusinessUserController::class, 'deleteConfirmBusinessUser'])->name('ubayda.business.user.delete');
-                    Route::delete('/delete/{id}', [BusinessUserController::class, 'destroyBusinessUser'])->name('ubayda.business.user.destroy');
+                    Route::get('/delete/{business}', [BusinessUserController::class, 'deleteConfirmBusinessUser'])
+                        ->middleware('can:deleteBusinessUser,business')
+                        ->name('ubayda.business.user.delete');
+                    Route::delete('/delete/{business}', [BusinessUserController::class, 'destroyBusinessUser'])
+                        ->middleware('can:deleteBusinessUser,business')
+                        ->name('ubayda.business.user.destroy');
 
                     Route::get('/select/{id}', [BusinessUserController::class, 'selectBusinessUser'])->name('ubayda.business.user.select');
 
+                    // This generic route should be last to avoid conflicts
                     Route::get('/detail/{id}', [BusinessUserController::class, 'detailBusinessUser'])
                         ->name('ubayda.business.user.detail');
                 });

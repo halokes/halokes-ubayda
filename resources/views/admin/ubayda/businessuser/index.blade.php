@@ -114,7 +114,7 @@
                                         </td>
                                         <td>
                                             <a class="action-icon"
-                                                href="{{ route('ubayda.business.user.delete', ['id' => $business->id]) }}"
+                                                href="{{ route('ubayda.business.user.delete', ['business' => $business->id]) }}"
                                                 title="delete">
                                                 <i class='bx bx-trash'></i>
                                             </a>

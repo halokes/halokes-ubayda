@@ -200,4 +200,58 @@ class BusinessUserController extends Controller
 
         return view('admin.ubayda.businessuser.detail', compact('data', 'owners', 'breadcrumbs'));
     }
+
+    /**
+     * =============================================
+     *      DELETE THE BUSINESS - show confirmation
+     * =============================================
+     */
+    public function deleteConfirmBusinessUser(Request $request, $id)
+    {
+        $userId = Auth::user()->id;
+
+        // Get business details
+        $data = $this->businessService->getBusinessDetail($id);
+
+        if (!$data) {
+            $alert = AlertHelper::createAlert('danger', 'Business not found');
+            return redirect()->route('ubayda.business.user.index')->with([
+                'alerts' => [$alert]
+            ]);
+        }
+
+        // Check if user has access to this business using the policy
+        if (!$request->user()->can('deleteBusinessUser', $data)) {
+            $alert = AlertHelper::createAlert('danger', 'You do not have access to delete this business');
+            return redirect()->route('ubayda.business.user.index')->with([
+                'alerts' => [$alert]
+            ]);
+        }
+
+        // Get business owners (users with OWNER role)
+        $owners = $this->businessUserService->getBusinessOwners($id);
+
+        $breadcrumbs = array_merge($this->mainBreadcrumbs, ['Delete' => null]);
+
+        return view('admin.ubayda.businessuser.delete', compact('data', 'business', 'breadcrumbs'));
+    }
+
+    /**
+     * =============================================
+     *      DELETE THE BUSINESS - process delete
+     * =============================================
+     */
+    public function destroyBusinessUser(Business $business)
+    {
+
+        $result = $this->businessService->deleteBusiness($business->id);
+
+        $alert = $result
+            ? AlertHelper::createAlert('success', 'Data business ' . $business->name . ' successfully deleted')
+            : AlertHelper::createAlert('danger', 'Data business ' . $business->name . ' failed to be deleted');
+
+        return redirect()->route('ubayda.business.user.index')->with([
+            'alerts'        => [$alert]
+        ]);
+    }
 }
